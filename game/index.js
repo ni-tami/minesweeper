@@ -24,10 +24,11 @@ function updateGrid() {
   grid.getGrid().forEach((row) => {
     var rowEl = document.createElement("tr");
     row.forEach((cell) => {
+      var tdEl = document.createElement("td");
       var btnEl = document.createElement("button");
-      btnEl.style = "width: 32px; height: 32px; font-size: 16px;";
-      btnEl.innerHTML = cell.getDescription() || " ";
-      rowEl.appendChild(btnEl);  
+      tdEl.appendChild(btnEl);
+      btnEl.innerHTML = cell.getDescription();
+      rowEl.appendChild(tdEl);  
     });
     gridEl.appendChild(rowEl);
   });
