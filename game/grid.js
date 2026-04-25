@@ -2,7 +2,7 @@ import { Cell, CellValues } from "./cell.js";
 import { getRandomInt } from "../utils/index.js";
 
 export class Grid {
-    constructor(xSize, ySize, bombCount) {
+    constructor(xSize, ySize, bombCount, bombLocs = []) {
         if (xSize < 1 | ySize < 1) {
             throw new Error("Invalid grid dimension.");
         }
@@ -12,8 +12,8 @@ export class Grid {
         this.xSize = xSize
         this.ySize = ySize
         this.bombCount = bombCount
-        this.grid = []
-        this.bombLocs = []
+        this.initEmptyGrid()
+        this.bombLocs = bombLocs
     }
 
     getCellNeighborLocs(x, y) {
@@ -38,6 +38,7 @@ export class Grid {
     }
 
     initEmptyGrid() {
+        this.grid = []
         for (let x = 0; x < this.xSize; x++) {
             var row = []
             for (let y = 0; y < this.ySize; y++) {
@@ -49,14 +50,6 @@ export class Grid {
 
     initGrid() {
         var gridFlatSize = this.xSize * this.ySize
-        for (let x = 0; x < this.xSize; x++) {
-            var row = []
-            for (let y = 0; y < this.ySize; y++) {
-                row.push(new Cell(x, y, 0))
-            }
-            this.grid.push(row);            
-        }
-
         var bombIndexes = []
         for (let b = 0; b < this.bombCount; b++) {
             let bombFlatIndex = getRandomInt(0, gridFlatSize)
@@ -111,13 +104,5 @@ export class Grid {
 
     getGrid() {
         return this.grid;
-    }
-    getGridDescription() {
-        //  get grid as array of array of string from cell descriptions
-        return this.grid.map(row => row.map(cell => cell.getDescription()));
-    }
-    getGridValueKeys() {
-        //  get grid as array of array of string from cell value keys
-        return this.grid.map(row => row.map(cell => cell.getCellValueKey() || cell.value));
     }
 }

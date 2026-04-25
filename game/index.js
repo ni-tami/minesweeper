@@ -68,9 +68,7 @@ function loadGrid() {
   let saved = localStorage.getItem("grid");
   if (saved !== null) {
     var parsed = JSON.parse(saved);
-    grid = new Grid(parsed.xSize, parsed.ySize, parsed.bombCount);
-    grid.initEmptyGrid();
-    grid.bombLocs = parsed.bombLocs;
+    grid = new Grid(parsed.xSize, parsed.ySize, parsed.bombCount, parsed.bombLocs);
     grid.initGridWithBombLocs();
     showMessage("Loaded!");
   }
