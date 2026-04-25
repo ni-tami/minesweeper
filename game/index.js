@@ -1,5 +1,5 @@
 import { Grid } from "./grid.js";
-import { Cell } from "./cell.js";
+import { Cell, CellValues } from "./cell.js";
 import { getRandomInt } from "../utils/index.js";
 
 // Declare the counter
@@ -26,7 +26,7 @@ function updateGrid() {
     row.forEach((cell) => {
       var btnEl = document.createElement("button");
       btnEl.style = "width: 32px; height: 32px; font-size: 16px;";
-      btnEl.innerHTML = cell.value.description || cell.value.toString() || " ";
+      btnEl.innerHTML = cell.getDescription() || " ";
       rowEl.appendChild(btnEl);  
     });
     gridEl.appendChild(rowEl);
@@ -56,7 +56,6 @@ function saveGrid() {
     xSize: grid.xSize,
     ySize: grid.ySize,
     bombCount: grid.bombCount,
-    grid: grid.getGrid(),
     bombLocs: grid.bombLocs,
   }));
   showMessage("Saved!");
@@ -64,17 +63,16 @@ function saveGrid() {
 
 // Function to load the grid
 function loadGrid() {
+  const gridEl = document.getElementById("grid");
+  gridEl.innerHTML = "";
   let saved = localStorage.getItem("grid");
   if (saved !== null) {
-    grid = new Grid(JSON.parse(saved).xSize, JSON.parse(saved).ySize, JSON.parse(saved).bombCount);
-    grid.grid = JSON.parse(saved).grid;
-    grid.bombLocs = JSON.parse(saved).bombLocs;
-    grid.grid = JSON.parse(saved).grid;
-    console.log("grid: ", grid);
-    console.log("grid.grid: ", grid.grid);
-    console.log("grid.bombLocs: ", grid.bombLocs);
+    var parsed = JSON.parse(saved);
+    grid = new Grid(parsed.xSize, parsed.ySize, parsed.bombCount);
+    grid.initEmptyGrid();
+    grid.bombLocs = parsed.bombLocs;
+    grid.initGridWithBombLocs();
     showMessage("Loaded!");
   }
-  grid.initGrid();
   updateGrid();
 }

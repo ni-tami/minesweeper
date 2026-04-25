@@ -1,7 +1,7 @@
 export const CellValues = Object.freeze({
-  FLAG: Symbol("🚩"),
+  "FLAG": Symbol("🚩"),
   0: Symbol(" "),
-  BOMB: Symbol("💣"),
+  "BOMB": Symbol("💣"),
   1: Symbol("1"),
   2: Symbol("2"),
   3: Symbol("3"),
@@ -17,5 +17,15 @@ export class Cell {
         this.x = x
         this.y = y
         this.value = value
+    }
+    getDescription() {
+        // get description of this.value if it's a symbol, otherwise return the value as string
+        if (typeof this.value === 'symbol') {
+            return this.value.description;
+        }
+        return this.value.toString();
+    }
+    getCellValueKey() {
+        return Object.keys(CellValues).find(key => CellValues[key] === this.value);
     }
 }
