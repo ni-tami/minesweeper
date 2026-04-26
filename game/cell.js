@@ -13,10 +13,11 @@ export const CellValues = Object.freeze({
 });
 
 export class Cell {
-    constructor(x, y, value) {
+    constructor(x, y, value, isRevealed = false) {
         this.x = x
         this.y = y
         this.value = value
+        this.isRevealed = isRevealed
     }
     getDescription() {
         // get description of this.value if it's a symbol, otherwise return the value as string
