@@ -1,6 +1,5 @@
-import { Cell, CellValues } from "./cell.js";
+import { Cell, CellStates, CellValues } from "./cell.js";
 import { getRandomInt } from "../utils/index.js";
-import { GameState } from "./state.js";
 
 export class Grid {
     constructor(xSize, ySize, bombCount, bombLocs = [], revealedCount = 0) {
@@ -13,10 +12,7 @@ export class Grid {
         this.xSize = xSize
         this.ySize = ySize
         this.bombCount = bombCount
-        this.initEmptyGrid()
         this.bombLocs = bombLocs
-        this.revealedCount = revealedCount
-        this.gameState = GameState.INPROGRESS
     }
 
     getCellNeighborLocs(x, y) {
@@ -41,17 +37,20 @@ export class Grid {
     }
 
     initEmptyGrid() {
-        this.grid = []
+        var grid = []
         for (let x = 0; x < this.xSize; x++) {
             var row = []
             for (let y = 0; y < this.ySize; y++) {
-                row.push(new Cell(x, y, 0, false))
+                row.push(new Cell(x, y, 0, CellStates.COVERED))
             }
-            this.grid.push(row);            
+            grid.push(row);            
         }
+        this.bombLocs = []
+        return grid
     }
 
     initGrid() {
+        var grid = this.initEmptyGrid()
         var gridFlatSize = this.xSize * this.ySize
         for (let b = 0; b < this.bombCount; b = this.bombLocs.length) {
             let bombFlatIndex = getRandomInt(0, gridFlatSize)
@@ -63,76 +62,51 @@ export class Grid {
                 continue;
             }
             this.bombLocs.push([x,y])
-            this.grid[x][y].value = CellValues.BOMB;
+            grid[x][y].value = CellValues.BOMB;
         }
         for (let _loc of this.bombLocs) {
             let neiLocs = this.getCellNeighborLocs(_loc[0], _loc[1])
             for (let neiLoc of neiLocs) {
-                if (this.grid[neiLoc[0]][neiLoc[1]].value !== CellValues.BOMB) {
-                    this.grid[neiLoc[0]][neiLoc[1]].value += 1
+                if (grid[neiLoc[0]][neiLoc[1]].value !== CellValues.BOMB) {
+                    grid[neiLoc[0]][neiLoc[1]].value += 1
                 }
             }
         }
         for (let x = 0; x < this.xSize; x++) {
             for (let y = 0; y < this.ySize; y++) {
-                if (typeof this.grid[x][y].value === 'number') {
-                    this.grid[x][y].value = CellValues[this.grid[x][y].value];
+                if (typeof grid[x][y].value === 'number') {
+                    grid[x][y].value = CellValues[grid[x][y].value];
                 }
             }
         }
+        return grid
     }
 
     initGridWithBombLocs() {
         if (this.bombLocs == []) {
-            return
+            console.error("bombLocs is empty.")
         }
+        var grid = this.initEmptyGrid();
         for (let bombLoc of this.bombLocs) {
-            this.grid[bombLoc[0]][bombLoc[1]].value = CellValues.BOMB;
+            grid[bombLoc[0]][bombLoc[1]].value = CellValues.BOMB;
         }
         for (let _loc of this.bombLocs) {
             let neiLocs = this.getCellNeighborLocs(_loc[0], _loc[1]);
             for (let neiLoc of neiLocs) {
             if (
-                this.grid[neiLoc[0]][neiLoc[1]].value !== CellValues.BOMB
+                grid[neiLoc[0]][neiLoc[1]].value !== CellValues.BOMB
             ) {
-                this.grid[neiLoc[0]][neiLoc[1]].value += 1;
+                grid[neiLoc[0]][neiLoc[1]].value += 1;
             }
             }
         }
         for (let x = 0; x < this.xSize; x++) {
             for (let y = 0; y < this.ySize; y++) {
-                if (typeof this.grid[x][y].value === "number") {
-                    this.grid[x][y].value = CellValues[this.grid[x][y].value];
+                if (typeof grid[x][y].value === "number") {
+                    grid[x][y].value = CellValues[grid[x][y].value];
                 }
             }
         }
-    }
-
-    flood(x, y) {
-        this.grid[x][y].isRevealed = true
-        if (this.grid[x][y].value == CellValues["BOMB"]) {
-            this.gameState = GameState.LOSE;
-            return;
-        }
-        this.revealedCount += 1;
-        if (this.grid[x][y].value != CellValues[0]) {
-            return;
-        }
-        var neiLocs = this.getCellNeighborLocs(x, y);
-        if (neiLocs.length == 0) {
-            return
-        }
-        neiLocs.forEach((neiLoc) => {
-            var neiX = neiLoc[0];
-            var neiY = neiLoc[1];
-            var neiIsRevealed = this.grid[neiX][neiY].isRevealed
-            if (!neiIsRevealed) {
-                this.flood(neiX, neiY);
-            }
-        })
-    }
-
-    getGrid() {
-        return this.grid;
+        return grid
     }
 }
