@@ -118,10 +118,6 @@ export class Grid {
         if (this.grid[x][y].value != CellValues[0]) {
             return;
         }
-        if (this.revealedCount == (this.xSize * this.ySize - this.bombCount)) {
-            this.gameState = GameState.WON;
-            return;
-        }
         var neiLocs = this.getCellNeighborLocs(x, y);
         if (neiLocs.length == 0) {
             return

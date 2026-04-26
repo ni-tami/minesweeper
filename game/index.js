@@ -87,5 +87,9 @@ function loadGrid() {
 
 function revealCell(e, cCell) {
   grid.flood(cCell.x, cCell.y);
+  if (grid.revealedCount == grid.xSize * grid.ySize - grid.bombCount) {
+    grid.gameState = GameState.WON;
+    return;
+  }
   updateGrid();
 }
