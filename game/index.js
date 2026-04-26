@@ -48,12 +48,44 @@ function renderGrid() {
     });
     gridEl.appendChild(rowEl);
   });
-  if (grid.gameState == GameState.WON || grid.gameState == GameState.LOSE) {
-    showMessage(grid.gameState);
-    setTimeout(function () {
-      resetGrid();
-    }, 5000);
+}
+
+
+function flood(x, y) {
+  var cellEl = document.getElementById(
+    `cell_${x}_${y}_${CellStates.COVERED}`,
+  );
+
+  if (cellEl) {
+    cellEl.id = `cell_${x}_${y}_${CellStates.REVEALED}`;
+  } else {
+    cellEl = document.getElementById(
+      `cell_${x}_${y}_${CellStates.REVEALED}`,
+    );
   }
+  cellEl.className = "revealed"
+  if (cellEl.innerHTML == CellValues.BOMB.description) {
+      gameState = GameState.LOSE;
+      return;
+  }
+  revealedNonBombCount += 1;
+  if (cellEl.innerHTML != CellValues[0].description) {
+      return;
+  }
+  var neiLocs = gridConfig.getCellNeighborLocs(x, y);
+  if (neiLocs.length == 0) {
+      return
+  }
+  neiLocs.forEach((neiLoc) => {
+      var neiX = neiLoc[0];
+      var neiY = neiLoc[1];
+      var neiCovered = document.getElementById(
+        `cell_${neiX}_${neiY}_${CellStates.COVERED}`,
+      );
+      if (neiCovered) {
+          flood(neiX, neiY);
+      }
+  })
 }
 
 
@@ -173,6 +205,18 @@ function revealCell(e, cCell) {
 }
 
 function revealCell(e, cCell) {
-  grid.flood(cCell.x, cCell.y);
-  updateGrid();
+  if (gameState != GameState.INPROGRESS) {
+    return;
+  }
+  flood(cCell.x, cCell.y);
+  if (revealedNonBombCount == NON_BOMB_COUNT) {
+    gameState = GameState.WON;
+  }
+  if (gameState == GameState.WON || gameState == GameState.LOSE) {
+    showMessage(gameState);
+    setTimeout(function () {
+      resetGame();
+    }, 5000);
+  }
+  debugState();
 }
