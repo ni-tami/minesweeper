@@ -6,8 +6,13 @@
     <body>        
         <div>
             <h2>Minesweeper</h2>
-        
-            <p id="message" style="font-size:40px;"></p>
+            <div id="details">
+                <p>
+                <strong>Bomb count:</strong>
+                <span id="bombCount"></span>
+                </p>
+            </div>
+            <p id="message"></p>
             <button id="btnReset">Reset</button>
             <button id="btnSave">Save</button>
             <button id="btnLoad">Load</button>
@@ -41,6 +46,12 @@
                 display: flex;
                 justify-content: center;
                 align-items: center;
+            }
+            #details {
+                font-size: medium;
+            }
+            #message {
+                font-size: xx-large;
             }
             .covered {
                 color: transparent;

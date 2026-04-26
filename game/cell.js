@@ -12,12 +12,18 @@ export const CellValues = Object.freeze({
   8: Symbol("8"),
 });
 
+export const CellStates = Object.freeze({
+    FLAGGED: "flagged",
+    COVERED: "covered",
+    REVEALED: "revealed",
+})
+
 export class Cell {
-    constructor(x, y, value, isRevealed = false) {
+    constructor(x, y, value, state) {
         this.x = x
         this.y = y
         this.value = value
-        this.isRevealed = isRevealed
+        this.state = state
     }
     getDescription() {
         // get description of this.value if it's a symbol, otherwise return the value as string
@@ -25,8 +31,5 @@ export class Cell {
             return this.value.description;
         }
         return this.value.toString();
-    }
-    getCellValueKey() {
-        return Object.keys(CellValues).find(key => CellValues[key] === this.value);
     }
 }

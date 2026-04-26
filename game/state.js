@@ -1,5 +1,5 @@
 export const GameState = Object.freeze({
   WON: "YOU WON 🎉",
   LOSE: "GAME OVER ☠️",
-  INPROGRESS: "",
+  INPROGRESS: "GAME ON",
 });
