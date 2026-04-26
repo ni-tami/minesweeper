@@ -48,6 +48,12 @@ function renderGrid() {
     });
     gridEl.appendChild(rowEl);
   });
+  if (grid.gameState == GameState.WON || grid.gameState == GameState.LOSE) {
+    showMessage(grid.gameState);
+    setTimeout(function () {
+      resetGrid();
+    }, 5000);
+  }
 }
 
 
@@ -164,4 +170,13 @@ function revealCell(e, cCell) {
     }, 5000);
   }
   debugState();
+}
+
+function revealCell(e, cCell) {
+  grid.flood(cCell.x, cCell.y);
+  if (grid.revealedCount == grid.xSize * grid.ySize - grid.bombCount) {
+    grid.gameState = GameState.WON;
+    return;
+  }
+  updateGrid();
 }

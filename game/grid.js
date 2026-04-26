@@ -1,5 +1,6 @@
 import { Cell, CellStates, CellValues } from "./cell.js";
 import { getRandomInt } from "../utils/index.js";
+import { GameState } from "./state.js";
 
 export class Grid {
     constructor(xSize, ySize, bombCount, bombLocs = [], revealedCount = 0) {
@@ -13,6 +14,8 @@ export class Grid {
         this.ySize = ySize
         this.bombCount = bombCount
         this.bombLocs = bombLocs
+        this.revealedCount = revealedCount
+        this.gameState = GameState.INPROGRESS
     }
 
     getCellNeighborLocs(x, y) {
