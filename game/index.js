@@ -1,4 +1,4 @@
-import { CellValues, CellStates } from "./cell.js";
+import { CellValues, CellStates, Cell } from "./cell.js";
 import { Grid } from "./grid.js";
 import { GameState } from "./state.js";
 
@@ -39,11 +39,11 @@ function renderGrid() {
       var tdEl = document.createElement("td");
       var btnEl = document.createElement("button");
 
-      btnEl.id = `cell_${cell.x}_${cell.y}_${cell.state}`
-      btnEl.className = "covered"
+      btnEl.id = `cell_${cell.x}_${cell.y}`
+      btnEl.classList.add(CellStates.COVERED)
       btnEl.addEventListener("click", (e) => revealCell(e, cell));
+      btnEl.addEventListener("contextmenu", (e) => toggleFlagCell(e, cell));
       tdEl.appendChild(btnEl);
-      btnEl.innerHTML = cell.getDescription();
       rowEl.appendChild(tdEl);  
     });
     gridEl.appendChild(rowEl);
@@ -55,41 +55,6 @@ function renderGrid() {
     }, 5000);
   }
 }
-
-
-function flood(x, y) {
-  var cellEl = document.getElementById(`cell_${x}_${y}_${CellStates.COVERED}`);
-
-  if (cellEl) {
-    cellEl.id = `cell_${x}_${y}_${CellStates.REVEALED}`;
-  } else {
-    cellEl = document.getElementById(`cell_${x}_${y}_${CellStates.REVEALED}`);
-  }
-  cellEl.className = "revealed";
-  if (cellEl.innerHTML == CellValues.BOMB.description) {
-    gameState = GameState.LOSE;
-    return;
-  }
-  revealedNonBombCount += 1;
-  if (cellEl.innerHTML != CellValues[0].description) {
-    return;
-  }
-  var neiLocs = gridConfig.getCellNeighborLocs(x, y);
-  if (neiLocs.length == 0) {
-    return;
-  }
-  neiLocs.forEach((neiLoc) => {
-    var neiX = neiLoc[0];
-    var neiY = neiLoc[1];
-    var neiCovered = document.getElementById(
-      `cell_${neiX}_${neiY}_${CellStates.COVERED}`,
-    );
-    if (neiCovered) {
-      flood(neiX, neiY);
-    }
-  });
-}
-
 
 // Function to diplay message
 function showMessage(text) {
@@ -152,11 +117,50 @@ function loadGrid() {
   renderGrid();
 }
 
+function flood(cCell) {
+  var x = cCell.x
+  var y = cCell.y;
+  var state = cCell.state;
+  var value = cCell.value;
+  // TODO: refactor toggling between states
+  if (state == CellStates.FLAGGED) {
+    return;
+  }
+
+  if (state == CellStates.COVERED) {
+    grid[x][y].state = CellStates.REVEALED
+    var cellEl = document.getElementById(`cell_${x}_${y}`);
+    cellEl.classList.remove(CellStates.COVERED)
+    cellEl.classList.add(CellStates.REVEALED)
+    cellEl.innerHTML = grid[x][y].getDescription()
+  }
+  if (value == CellValues.BOMB) {
+    gameState = GameState.LOSE;
+    return;
+  }
+  revealedNonBombCount += 1;
+  if (value != CellValues[0]) {
+    return;
+  }
+  var neiLocs = gridConfig.getCellNeighborLocs(x, y);
+  if (neiLocs.length == 0) {
+    return;
+  }
+  neiLocs.forEach((neiLoc) => {
+    var neiX = neiLoc[0];
+    var neiY = neiLoc[1];
+    var neiCovered = grid[neiX][neiY].state == CellStates.COVERED;
+    if (neiCovered) {
+      flood(grid[neiX][neiY]);
+    }
+  });
+}
+
 function revealCell(e, cCell) {
   if (gameState != GameState.INPROGRESS) {
     return;
   }
-  flood(cCell.x, cCell.y);
+  flood(cCell);
   if (revealedNonBombCount == NON_BOMB_COUNT) {
     gameState = GameState.WON;
   }
@@ -167,4 +171,28 @@ function revealCell(e, cCell) {
     }, 5000);
   }
   debugState();
+}
+
+function toggleFlagCell(e, cCell) {
+  // TODO: refactor changing state
+  e.preventDefault();
+  var x = cCell.x;
+  var y = cCell.y;
+  var state = cCell.state;
+  var cellEl = document.getElementById(`cell_${x}_${y}`);
+  switch (state) {
+    case CellStates.FLAGGED:
+      grid[x][y].state = CellStates.COVERED;
+      cellEl.classList.add(CellStates.COVERED);
+      cellEl.classList.remove("flagged");
+      cellEl.innerHTML = "";
+      break;
+    case CellStates.COVERED:
+      grid[x][y].state = CellStates.FLAGGED;
+      cellEl.classList.remove(CellStates.COVERED);
+      cellEl.classList.add("flagged");
+      cellEl.innerHTML = CellValues.FLAG.description;
+    default:
+      break;
+  }
 }
