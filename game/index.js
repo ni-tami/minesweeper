@@ -108,13 +108,26 @@ function saveGrid() {
 // Function to load the grid, not including game state yet
 function loadGrid() {
   let saved = localStorage.getItem("grid");
-  if (saved !== null) {
-    var parsed = JSON.parse(saved);
-    var gridConfig = new Grid(parsed.xSize, parsed.ySize, parsed.bombCount, parsed.bombLocs);
-    grid = gridConfig.initGridWithBombLocs();
-    showMessage("Loaded!");
+  if (saved === null) {
+    var noSavedMsg = "No saved grid found. Resetting..."
+    showMessage(noSavedMsg)
+    resetGame();
+    return;
   }
+  var parsed = JSON.parse(saved);
+  gridConfig = new Grid(parsed.xSize, parsed.ySize, parsed.bombCount, []);
+  grid = gridConfig.initGridWithBombLocs();
+  if (gridConfig.bombLocs.length == 0) {
+    console.error("ERROR: bombLocs is empty.");
+    resetGame();
+    return;
+  }
+  showMessage("Loaded!");
+  debugState();
   renderGrid();
+  gameState = GameState.INPROGRESS;
+  revealedNonBombCount = 0;
+  console.log("RESETTING GAME...");
 }
 
 function flood(cCell) {

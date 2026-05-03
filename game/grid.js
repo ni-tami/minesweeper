@@ -48,7 +48,6 @@ export class Grid {
             }
             grid.push(row);            
         }
-        this.bombLocs = []
         return grid
     }
 
@@ -86,8 +85,8 @@ export class Grid {
     }
 
     initGridWithBombLocs() {
-        if (this.bombLocs == []) {
-            console.error("bombLocs is empty.")
+        if (this.bombLocs.length == 0) {
+            return;
         }
         var grid = this.initEmptyGrid();
         for (let bombLoc of this.bombLocs) {
