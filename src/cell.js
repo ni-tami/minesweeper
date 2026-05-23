@@ -26,7 +26,6 @@ export class Cell {
         this.state = state
     }
     getDescription() {
-        // get description of this.value if it's a symbol, otherwise return the value as string
         if (typeof this.value === 'symbol') {
             return this.value.description;
         }
