@@ -6,10 +6,29 @@
   "scripts": {
     "changeset": "changeset",
     "version-packages": "changeset version",
-    "release": "changeset publish"
+    "release": "changeset publish",
+    "test": "vitest run"
   },
   "license": "MIT",
+  "exports": {
+    ".": "./src/index.js"
+  },
+  "files": [
+    "src",
+    "README.md",
+    "LICENSE"
+  ],
+  "sideEffects": false,
+  "keywords": [
+    "minesweeper",
+    "game",
+    "vanillajs"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
   "devDependencies": {
-    "@changesets/cli": "^2.31.0"
+    "@changesets/cli": "^2.31.0",
+    "vitest": "^4.1.7"
   }
 }

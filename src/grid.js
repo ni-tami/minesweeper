@@ -1,10 +1,10 @@
 import { Cell, CellStates, CellValues } from "./cell.js";
-import { getRandomInt } from "../utils/index.js";
+import { getRandomInt } from "./utils.js";
 import { GameState } from "./state.js";
 
 export class Grid {
     constructor(xSize, ySize, bombCount, bombLocs = [], revealedCount = 0) {
-        if (xSize < 1 | ySize < 1) {
+        if (xSize < 1 || ySize < 1) {
             throw new Error("Invalid grid dimension.");
         }
         if (bombCount >= xSize * ySize) {
@@ -20,7 +20,7 @@ export class Grid {
 
     getCellNeighborLocs(x, y) {
         if (x < 0 || x >= this.xSize || y < 0 || y >= this.ySize) {
-            throw console.error("Index error.");
+            throw new Error("Index out of bounds.");
         }
         const locs = [
             [-1, -1], [0, -1], [1, -1], 
@@ -86,7 +86,7 @@ export class Grid {
 
     initGridWithBombLocs() {
         if (this.bombLocs.length == 0) {
-            return;
+            throw new Error("Bomb locations are empty.");
         }
         var grid = this.initEmptyGrid();
         for (let bombLoc of this.bombLocs) {
